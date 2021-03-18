@@ -2,6 +2,7 @@
 
 #include <AP_Common/AP_Common.h>
 
+#include "AP_ICEngine/AP_ICEngine.h"
 #include "RC_Channel.h"
 #include "AC_Sprayer/AC_Sprayer.h"
 #include "AP_Gripper/AP_Gripper.h"
@@ -287,7 +288,11 @@ public:
 
     // whether to enforce acceptance of packets only from sysid_my_gcs
     AP_Int8 sysid_enforce;
-
+	
+    /// @@ MR add based on Plane code	
+    // internal combustion engine control
+    AP_ICEngine ice_control;
+	
     // RC input channels
     RC_Channels_Rover rc_channels;
 

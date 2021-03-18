@@ -25,6 +25,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AC_PID/AC_P.h>
 #include <AC_PID/AC_PID.h>
+#include <AC_PID/AC_PID.h>
 #include <AP_AccelCal/AP_AccelCal.h>                // interface and maths for accelerometer calibration
 #include <AP_AHRS/AP_AHRS.h>                        // ArduPilot Mega DCM Library
 #include <AP_Airspeed/AP_Airspeed.h>                // needed for AHRS build
@@ -43,6 +44,8 @@
 #include <AP_NavEKF3/AP_NavEKF3.h>
 #include <AP_Navigation/AP_Navigation.h>
 #include <AP_OpticalFlow/AP_OpticalFlow.h>          // Optical Flow library
+#include <AP_ADSB/AP_ADSB.h>
+#include <AP_ICEngine/AP_ICEngine.h>                // ICE library - MR add based on Plane code
 #include <AP_Param/AP_Param.h>
 #include <AP_RangeFinder/AP_RangeFinder.h>          // Range finder library
 #include <AP_RCMapper/AP_RCMapper.h>                // RC input mapping library
