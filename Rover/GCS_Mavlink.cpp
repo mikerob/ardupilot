@@ -678,6 +678,12 @@ MAV_RESULT GCS_MAVLINK_Rover::handle_command_long_packet(const mavlink_command_l
                                               static_cast<int16_t>(packet.param3),
                                               packet.param4);
 
+    case MAV_CMD_DO_ENGINE_CONTROL:
+        if (!rover.g2.ice_control.engine_control(packet.param1, packet.param2, packet.param3)) {
+            return MAV_RESULT_FAILED;
+        }
+        return MAV_RESULT_ACCEPTED;
+
     default:
         return GCS_MAVLINK::handle_command_long_packet(packet);
     }

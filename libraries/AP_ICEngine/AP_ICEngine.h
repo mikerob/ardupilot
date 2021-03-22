@@ -39,7 +39,8 @@ public:
         ICE_START_HEIGHT_DELAY=1,
         ICE_START_DELAY=2,
         ICE_STARTING=3,
-        ICE_RUNNING=4
+        ICE_RUNNING=4,
+		ICE_IGNITION=5
     };
 
     // get current engine control state

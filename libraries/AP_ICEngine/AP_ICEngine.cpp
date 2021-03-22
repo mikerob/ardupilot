@@ -168,7 +168,7 @@ void AP_ICEngine::update(void)
     }
 
     uint16_t cvalue = 1500;
-    RC_Channel *c = rc().channel(start_chan-1);
+    RC_Channel *c = rc().channel(start_chan-1); // Not a very graceful way to handle start_chan=0 - just checks for nullptr?
     if (c != nullptr && rc().has_valid_input()) {
         // get starter control channel
         cvalue = c->get_radio_in();
@@ -216,9 +216,18 @@ void AP_ICEngine::update(void)
         should_run = false;
     }
 
+
     // switch on current state to work out new state
     switch (state) {
-    case ICE_OFF:
+    case ICE_IGNITION: // Do nothing except if switch has overridden
+        if (!should_run) {
+            state = ICE_OFF;
+            gcs().send_text(MAV_SEVERITY_INFO, "Stopped engine");
+        }
+		break;
+	
+	case ICE_OFF:
+		gcs().send_text(MAV_SEVERITY_INFO, "Ice Off");
         if (should_run) {
             state = ICE_START_DELAY;
         }
@@ -253,7 +262,7 @@ void AP_ICEngine::update(void)
     case ICE_STARTING:
         if (!should_run) {
             state = ICE_OFF;
-        } else if (now - starter_start_time_ms >= starter_time*1000) {
+        } else if ((now - starter_start_time_ms >= starter_time*1000) && starter_last_run_ms>0) { // Without condition for last_run, reset of start_time to 0 when "ICE_OFF" prevents starter from running
             state = ICE_RUNNING;
         }
         break;
@@ -290,10 +299,18 @@ void AP_ICEngine::update(void)
 
     /* now set output channels */
     switch (state) {
+    case ICE_IGNITION:
+        SRV_Channels::set_output_pwm(SRV_Channel::k_ignition, pwm_ignition_on);
+        SRV_Channels::set_output_pwm(SRV_Channel::k_starter,  pwm_starter_off);
+        starter_start_time_ms = 0;
+        starter_last_run_ms = 0; // Starter hasn't been run, therefore start_time of 0 should not be used for comparison for ICE_STARTING
+        break;
+		
     case ICE_OFF:
         SRV_Channels::set_output_pwm(SRV_Channel::k_ignition, pwm_ignition_off);
         SRV_Channels::set_output_pwm(SRV_Channel::k_starter,  pwm_starter_off);
         starter_start_time_ms = 0;
+        starter_last_run_ms = 0; // Starter hasn't been run, therefore start_time of 0 should not be used for comparison for ICE_STARTING
         break;
 
     case ICE_START_HEIGHT_DELAY:
@@ -373,7 +390,14 @@ bool AP_ICEngine::engine_control(float start_control, float cold_start, float he
         gcs().send_text(MAV_SEVERITY_INFO, "Takeoff height set to %.1fm", (double)height_delay);
         return true;
     }
-    state = ICE_STARTING;
+	if (start_control>(float)1.5) {
+        state = ICE_IGNITION;
+		return true;
+	}
+	if (start_control>(float)0) {
+		state = ICE_STARTING;
+		starter_last_run_ms = 0; // Reset to enable starter even if already "started"
+	}
     return true;
 }
 
