@@ -227,8 +227,7 @@ void AP_ICEngine::update(void)
 		break;
 	
 	case ICE_OFF:
-		gcs().send_text(MAV_SEVERITY_INFO, "Ice Off");
-        if (should_run) {
+		if (should_run) {
             state = ICE_START_DELAY;
         }
         break;
