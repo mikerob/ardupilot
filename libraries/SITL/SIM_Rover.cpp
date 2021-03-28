@@ -68,6 +68,14 @@ float SimRover::calc_yaw_rate(float steering, float speed)
         return 0;
     }
     float d = turn_circle(steering);
+	if (fabsf(d)>1.0e-2) { // Dividing by d so set a threshold - 0.02m turning circle is basically impossible anyway
+		float lat_a = speed*speed / (d/2.0f); // lateral acceleration
+		if (lat_a>10.0f) { // sanity check / cap at 1g
+			lat_a=10.0f;
+		}
+		float ds = lat_a * steering_unwind; // -1 - 1 / m/s/s in effective steering unwind - look up vehicle dynamics for better basis
+		d = turn_circle(steering-ds);
+	}
     float c = M_PI * d;
     float t = c / speed;
     float rate = 360.0f / t;
@@ -119,7 +127,12 @@ void SimRover::update(const struct sitl_input &input)
 
     // linear acceleration in m/s/s - very crude model
     float accel = max_accel * (target_speed - speed) / max_speed;
-
+	if (brake && throttle<0.0 && speed >0.0) { // Apply brake if speed is positive and throttle negative
+		accel = throttle * max_brake;
+	}
+	if (speed > 0.0 ) { 
+		accel = accel - idle_decel;
+	}
     gyro = Vector3f(0,0,radians(yaw_rate));
 
     // update attitude
