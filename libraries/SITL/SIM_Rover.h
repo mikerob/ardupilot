@@ -38,13 +38,6 @@ public:
     }
 
 private:
-<<<<<<< HEAD
-    float max_speed;
-    float max_accel;
-    float max_wheel_turn;
-    float turning_circle;
-    float skid_turn_rate;
-=======
     float max_speed = 40.0f;
     float max_accel = 4.0f;
     float max_brake = 8.0f; // full brake deceleration
@@ -53,11 +46,10 @@ private:
     float turning_circle = 20.0f; // diameter
     float skid_turn_rate = 140.0f;
 	float steering_unwind = 0.025f; // effective steering output reduced by this factor (e.g. output = calculated - calculated*lateral_acc * steering_unwind - loss of 2.5% of traction
->>>>>>> 824ddd0aeb... Sim tweak to add lateral acc limit and slow accelerations
     bool skid_steering;
 	bool brake = true;
 
-    float turn_circle(float steering);
+    float turn_circle(float steering) const;
     float calc_yaw_rate(float steering, float speed);
     float calc_lat_accel(float steering_angle, float speed);
 };

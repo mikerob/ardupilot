@@ -24,13 +24,7 @@
 namespace SITL {
 
 SimRover::SimRover(const char *frame_str) :
-    Aircraft(frame_str),
-    max_speed(20),
-    max_accel(10),
-    max_wheel_turn(35),
-    turning_circle(1.8),
-    skid_turn_rate(140), // degrees/sec
-    skid_steering(false)
+    Aircraft(frame_str)
 {
     skid_steering = strstr(frame_str, "skid") != nullptr;
 
@@ -48,7 +42,7 @@ SimRover::SimRover(const char *frame_str) :
 /*
   return turning circle (diameter) in meters for steering angle proportion in degrees
 */
-float SimRover::turn_circle(float steering)
+float SimRover::turn_circle(float steering) const
 {
     if (fabsf(steering) < 1.0e-6) {
         return 0;
@@ -127,10 +121,10 @@ void SimRover::update(const struct sitl_input &input)
 
     // linear acceleration in m/s/s - very crude model
     float accel = max_accel * (target_speed - speed) / max_speed;
-	if (brake && throttle<0.0 && speed >0.0) { // Apply brake if speed is positive and throttle negative
+	if (brake && throttle<0.0f && speed >0.0f) { // Apply brake if speed is positive and throttle negative
 		accel = throttle * max_brake;
 	}
-	if (speed > 0.0 ) { 
+	if (speed > 0.0f ) { 
 		accel = accel - idle_decel;
 	}
     gyro = Vector3f(0,0,radians(yaw_rate));
