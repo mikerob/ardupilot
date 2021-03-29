@@ -912,6 +912,11 @@ public:
 
     void do_not_use_GPS();
 
+    // returns true if LAND mode is trying to control X/Y position
+    bool controlling_position() const { return control_position; }
+
+    void set_land_pause(bool new_value) { land_pause = new_value; }
+
 protected:
 
     const char *name() const override { return "LAND"; }
@@ -921,6 +926,11 @@ private:
 
     void gps_run();
     void nogps_run();
+
+    bool control_position; // true if we are using an external reference to control position
+
+    uint32_t land_start_time;
+    bool land_pause;
 };
 
 
@@ -1285,11 +1295,12 @@ public:
     bool init(bool ignore_checks) override;
     void run() override;
 
-    bool requires_GPS() const override { return true; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(bool from_gcs) const override { return true; };
+    bool requires_GPS() const override { return false; }
+    bool has_manual_throttle() const override { return true; }
+    bool allows_arming(bool from_gcs) const override { return false; };
     bool is_autopilot() const override { return false; }
     bool logs_attitude() const override { return true; }
+
     void set_magnitude(float input) { waveform_magnitude = input; }
 
     static const struct AP_Param::GroupInfo var_info[];
