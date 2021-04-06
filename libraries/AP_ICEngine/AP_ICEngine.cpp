@@ -294,6 +294,9 @@ void AP_ICEngine::update(void)
             // force ignition off when disarmed
             state = ICE_OFF;
         }
+        if (state == ICE_STARTING || state == ICE_START_DELAY) { // Inhibit start if disarmed, even if idle_percent > 0
+			state = ICE_OFF;
+		}
     }
 
     /* now set output channels */
